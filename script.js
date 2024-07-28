@@ -1,0 +1,74 @@
+document.addEventListener('DOMContentLoaded', function() {
+    // Select DOM elements
+    const addButton = document.getElementById('add-button');
+    const taskInput = document.getElementById('task-input');
+    const taskList = document.getElementById('task-list');
+
+    // Load tasks from Local Storage
+    function loadTasks() {
+        const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        tasks.forEach(taskText => {
+            addTaskToDOM(taskText);
+        });
+    }
+
+    // Save tasks to Local Storage
+    function saveTasks(tasks) {
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
+
+    // Add a new task to the DOM
+    function addTaskToDOM(taskText) {
+        const listItem = document.createElement('li');
+        listItem.textContent = taskText;
+
+        const removeButton = document.createElement('button');
+        removeButton.textContent = "Remove";
+        removeButton.className = 'remove-btn';
+
+        removeButton.onclick = function() {
+            taskList.removeChild(listItem);
+            removeTaskFromStorage(taskText);
+        };
+
+        listItem.appendChild(removeButton);
+        taskList.appendChild(listItem);
+    }
+
+    // Add a new task
+    function addTask() {
+        const taskText = taskInput.value.trim();
+
+        if (taskText === "") {
+            alert("Please enter a task.");
+            return;
+        }
+
+        addTaskToDOM(taskText);
+
+        const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        tasks.push(taskText);
+        saveTasks(tasks);
+
+        taskInput.value = '';
+    }
+
+    // Remove a task from Local Storage
+    function removeTaskFromStorage(taskText) {
+        let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        tasks = tasks.filter(task => task !== taskText);
+        saveTasks(tasks);
+    }
+
+    // Event listeners
+    addButton.addEventListener('click', addTask);
+
+    taskInput.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            addTask();
+        }
+    });
+
+    // Load tasks from Local Storage when the page loads
+    loadTasks();
+});
